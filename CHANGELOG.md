@@ -1,4 +1,9 @@
 
+## v1.0.3 - 2025-11-17
+
+- Configure goreleaser
+
+
 ## v1.0.2 - 2025-11-17
 
 - Try to use Github Releases

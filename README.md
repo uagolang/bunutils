@@ -1,4 +1,4 @@
-# bunhelpers
+# bunutils
 
 [![Go Version](https://img.shields.io/badge/go-1.25+-blue.svg)](https://golang.org)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
@@ -26,7 +26,7 @@ All other features (transactions, basic selectors, querier interface, error hand
 ## Installation
 
 ```bash
-go get github.com/uagolang/bunhelpers
+go get github.com/uagolang/bunutils
 ```
 
 ## Quick Start
@@ -38,7 +38,7 @@ import (
     "context"
     "database/sql"
     
-    "github.com/uagolang/bunhelpers"
+    "github.com/uagolang/bunutils"
     "github.com/uptrace/bun"
     "github.com/uptrace/bun/dialect/pgdialect"
     "github.com/uptrace/bun/driver/pgdriver"
@@ -56,8 +56,8 @@ func main() {
     var users []User
     err := db.NewSelect().
         Model(&users).
-        Apply(bunhelpers.WhereEqual("status", "active")).
-        Apply(bunhelpers.WhereContains("email", "example.com")).
+        Apply(bunutils.WhereEqual("status", "active")).
+        Apply(bunutils.WhereContains("email", "example.com")).
         Scan(ctx)
 }
 ```
@@ -72,25 +72,25 @@ Build complex queries using composable selector functions:
 
 ```go
 // Equality checks
-query.Apply(bunhelpers.WhereEqual("status", "active"))
-query.Apply(bunhelpers.WhereNotEqual("role", "guest"))
+query.Apply(bunutils.WhereEqual("status", "active"))
+query.Apply(bunutils.WhereNotEqual("role", "guest"))
 
 // NULL checks
-query.Apply(bunhelpers.WhereNull("deleted_at"))
-query.Apply(bunhelpers.WhereNotNull("verified_at"))
+query.Apply(bunutils.WhereNull("deleted_at"))
+query.Apply(bunutils.WhereNotNull("verified_at"))
 
 // IN clauses
-query.Apply(bunhelpers.WhereIn("id", []string{"1", "2", "3"}))
-query.Apply(bunhelpers.WhereNotIn("status", []string{"banned", "suspended"}))
+query.Apply(bunutils.WhereIn("id", []string{"1", "2", "3"}))
+query.Apply(bunutils.WhereNotIn("status", []string{"banned", "suspended"}))
 
 // String matching (case-insensitive, PostgreSQL ILIKE operator)
-query.Apply(bunhelpers.WhereContains("name", "john"))  // ILIKE '%john%'
-query.Apply(bunhelpers.WhereBegins("email", "admin")) // ILIKE 'admin%'
-query.Apply(bunhelpers.WhereEnds("domain", ".com"))   // ILIKE '%.com'
+query.Apply(bunutils.WhereContains("name", "john"))  // ILIKE '%john%'
+query.Apply(bunutils.WhereBegins("email", "admin")) // ILIKE 'admin%'
+query.Apply(bunutils.WhereEnds("domain", ".com"))   // ILIKE '%.com'
 
 // Time-based queries
-query.Apply(bunhelpers.WhereBefore("created_at", time.Now()))
-query.Apply(bunhelpers.WhereAfter("updated_at", lastWeek))
+query.Apply(bunutils.WhereBefore("created_at", time.Now()))
+query.Apply(bunutils.WhereAfter("updated_at", lastWeek))
 ```
 
 #### JSONB Selectors
@@ -101,18 +101,18 @@ Work with PostgreSQL JSONB columns safely:
 
 ```go
 // Simple JSONB field equality
-query.Apply(bunhelpers.WhereJsonbEqual("metadata", "status", "verified"))
+query.Apply(bunutils.WhereJsonbEqual("metadata", "status", "verified"))
 // Generates: metadata->>'status' = 'verified'
 
 // Nested JSONB path equality
-query.Apply(bunhelpers.WhereJsonbPathEqual("data", []string{"user", "profile", "name"}, "John"))
+query.Apply(bunutils.WhereJsonbPathEqual("data", []string{"user", "profile", "name"}, "John"))
 // Generates: data->'user'->'profile'->>'name' = 'John'
 
 // JSONB array of objects - find object with matching field
-query.Apply(bunhelpers.WhereJsonbObjectsArrayKeyValueEqual("tags", "items", "id", "123"))
+query.Apply(bunutils.WhereJsonbObjectsArrayKeyValueEqual("tags", "items", "id", "123"))
 
 // Nested array search
-query.Apply(bunhelpers.WhereJsonbPathObjectsArrayKeyValueEqual(
+query.Apply(bunutils.WhereJsonbPathObjectsArrayKeyValueEqual(
     "metadata", 
     []string{"users", "preferences"}, 
     "theme", 
@@ -125,33 +125,33 @@ query.Apply(bunhelpers.WhereJsonbPathObjectsArrayKeyValueEqual(
 ```go
 // Apply multiple conditions
 query.Apply(
-    bunhelpers.WhereEqual("status", "active"),
-    bunhelpers.WhereNotNull("verified_at"),
+    bunutils.WhereEqual("status", "active"),
+    bunutils.WhereNotNull("verified_at"),
 )
 
 // Conditional application
 isAdmin := true
-query.Apply(bunhelpers.ApplyIf(isAdmin, 
-    bunhelpers.WhereEqual("role", "admin"),
+query.Apply(bunutils.ApplyIf(isAdmin, 
+    bunutils.WhereEqual("role", "admin"),
 ))
 
 // OR groups
-query.Apply(bunhelpers.OrGroup(
-    bunhelpers.WhereEqual("status", "active"),
-    bunhelpers.WhereEqual("status", "pending"),
+query.Apply(bunutils.OrGroup(
+    bunutils.WhereEqual("status", "active"),
+    bunutils.WhereEqual("status", "pending"),
 ))
 
 // AND groups
-query.Apply(bunhelpers.AndGroup(
-    bunhelpers.WhereEqual("verified", true),
-    bunhelpers.WhereNotNull("email"),
+query.Apply(bunutils.AndGroup(
+    bunutils.WhereEqual("verified", true),
+    bunutils.WhereNotNull("email"),
 ))
 
 // Complex OR conditions
-query.Apply(bunhelpers.Or(
-    bunhelpers.WhereEqual("role", "admin"),
-    bunhelpers.WhereEqual("role", "moderator"),
-    bunhelpers.WhereEqual("role", "editor"),
+query.Apply(bunutils.Or(
+    bunutils.WhereEqual("role", "admin"),
+    bunutils.WhereEqual("role", "moderator"),
+    bunutils.WhereEqual("role", "editor"),
 ))
 ```
 
@@ -162,7 +162,7 @@ query.Apply(bunhelpers.Or(
 The `InTx` function handles transaction lifecycle automatically:
 
 ```go
-err := bunhelpers.InTx(ctx, db, func(ctx context.Context) error {
+err := bunutils.InTx(ctx, db, func(ctx context.Context) error {
     // Create user
     _, err := db.NewInsert().
         Model(&user).
@@ -189,7 +189,7 @@ err := bunhelpers.InTx(ctx, db, func(ctx context.Context) error {
 
 ```go
 func CreateUser(ctx context.Context, db *bun.DB, user *User) error {
-    return bunhelpers.InTx(ctx, db, func(ctx context.Context) error {
+    return bunutils.InTx(ctx, db, func(ctx context.Context) error {
         // This might create a new transaction OR use existing one
         _, err := db.NewInsert().Model(user).Exec(ctx)
         return err
@@ -197,7 +197,7 @@ func CreateUser(ctx context.Context, db *bun.DB, user *User) error {
 }
 
 func CreateUserWithProfile(ctx context.Context, db *bun.DB, user *User, profile *Profile) error {
-    return bunhelpers.InTx(ctx, db, func(ctx context.Context) error {
+    return bunutils.InTx(ctx, db, func(ctx context.Context) error {
         // Outer transaction
         if err := CreateUser(ctx, db, user); err != nil {
             return err // Nested call uses same transaction
@@ -221,7 +221,7 @@ if err != nil {
 defer tx.Rollback()
 
 // Store transaction in context
-ctx = bunhelpers.TxToContext(ctx, &tx)
+ctx = bunutils.TxToContext(ctx, &tx)
 
 // Pass context to functions
 err = createUser(ctx, db)
@@ -238,12 +238,12 @@ The Querier interface provides context-aware query builders:
 
 ```go
 type UserRepository struct {
-    querier bunhelpers.Querier
+    querier bunutils.Querier
 }
 
 func NewUserRepository(db *bun.DB) *UserRepository {
     return &UserRepository{
-        querier: bunhelpers.NewQuerier(db),
+        querier: bunutils.NewQuerier(db),
     }
 }
 
@@ -256,7 +256,7 @@ func (r *UserRepository) GetByID(ctx context.Context, id string) (*User, error) 
         Where("id = ?", id).
         Scan(ctx)
     
-    if bunhelpers.IsNotFoundError(err) {
+    if bunutils.IsNotFoundError(err) {
         return nil, fmt.Errorf("user not found")
     }
     
@@ -268,7 +268,7 @@ func (r *UserRepository) Create(ctx context.Context, user *User) error {
         Model(user).
         Exec(ctx)
     
-    if bunhelpers.IsConstraintError(err) {
+    if bunutils.IsConstraintError(err) {
         return fmt.Errorf("user already exists")
     }
     
@@ -282,7 +282,7 @@ Use the pre-built `Where` struct for common filtering patterns:
 
 ```go
 // Build complex filters
-where := &bunhelpers.Where{
+where := &bunutils.Where{
     IDs: []string{"1", "2", "3"},
     NotInIDs: []string{"99"},
     OnlyDeleted: false,
@@ -296,7 +296,7 @@ where := &bunhelpers.Where{
 }
 
 // Define sort mapping
-where.Order = bunhelpers.Order{
+where.Order = bunutils.Order{
     1: "created_at",
     2: "updated_at",
     3: "name",
@@ -317,7 +317,7 @@ const (
     FlagPremium  = 1 << 2  // 4
 )
 
-where := &bunhelpers.Where{
+where := &bunutils.Where{
     HasFlags: []int{FlagActive, FlagVerified},    // Must have both flags
     HasNotFlags: []int{FlagPremium},              // Must not have flag
 }
@@ -329,12 +329,12 @@ query = where.Where(query)
 #### Use as Selector
 
 ```go
-where := &bunhelpers.Where{IDs: []string{"1", "2"}}
+where := &bunutils.Where{IDs: []string{"1", "2"}}
 
 query := db.NewSelect().
     Model(&users).
-    Apply(bunhelpers.UseWhere(where)).
-    Apply(bunhelpers.WhereEqual("status", "active"))
+    Apply(bunutils.UseWhere(where)).
+    Apply(bunutils.WhereEqual("status", "active"))
 ```
 
 ### 5. Error Handling
@@ -345,14 +345,14 @@ Specialized error handlers for common database scenarios:
 user := new(User)
 err := db.NewSelect().Model(user).Where("id = ?", id).Scan(ctx)
 
-if bunhelpers.IsNotFoundError(err) {
+if bunutils.IsNotFoundError(err) {
     return fmt.Errorf("user not found")
 }
 
 // Check constraint violations
 _, err = db.NewInsert().Model(user).Exec(ctx)
 
-if bunhelpers.IsConstraintError(err) {
+if bunutils.IsConstraintError(err) {
     return fmt.Errorf("user with this email already exists")
 }
 ```
@@ -369,7 +369,7 @@ import (
     "log"
     "time"
 
-    "github.com/uagolang/bunhelpers"
+    "github.com/uagolang/bunutils"
     "github.com/uptrace/bun"
     "github.com/uptrace/bun/dialect/pgdialect"
     "github.com/uptrace/bun/driver/pgdriver"
@@ -387,10 +387,10 @@ type User struct {
     CreatedAt time.Time `bun:"created_at,nullzero,notnull,default:current_timestamp"`
 }
 
-// Custom Where struct that embeds bunhelpers.Where
+// Custom Where struct that embeds bunutils.Where
 // This allows you to add domain-specific filtering while reusing common filters
 type UserWhere struct {
-    bunhelpers.Where                          // Embed base Where for common filters
+    bunutils.Where                          // Embed base Where for common filters
     
     Status        string   `json:"status,omitempty" form:"status"`
     Roles         []string `json:"roles,omitempty" form:"roles"`
@@ -431,12 +431,12 @@ func (w *UserWhere) ApplyFilters(q *bun.SelectQuery) *bun.SelectQuery {
 }
 
 type UserRepository struct {
-    querier bunhelpers.Querier
+    querier bunutils.Querier
 }
 
 func NewUserRepository(db *bun.DB) *UserRepository {
     return &UserRepository{
-        querier: bunhelpers.NewQuerier(db),
+        querier: bunutils.NewQuerier(db),
     }
 }
 
@@ -460,7 +460,7 @@ func (r *UserRepository) Create(ctx context.Context, user *User) error {
         Model(user).
         Exec(ctx)
     
-    if bunhelpers.IsConstraintError(err) {
+    if bunutils.IsConstraintError(err) {
         return fmt.Errorf("user already exists")
     }
     
@@ -489,15 +489,15 @@ func main() {
         EmailContains: "example.com",
         IsVerified:    ToPtr(true),
         
-        // Base filters from bunhelpers.Where
-        Where: bunhelpers.Where{
+        // Base filters from bunutils.Where
+        Where: bunutils.Where{
             IDs:          []string{"1", "2", "3"},
             CreatedAfter: ToPtr(time.Now().Add(-7*24*time.Hour).UnixMilli()),
             Limit:        ToPtr(10),
             Offset:       ToPtr(0),
             SortBy:       1,
             SortDesc:     true,
-            Order: bunhelpers.Order{
+            Order: bunutils.Order{
                 1: "created_at",
                 2: "email",
                 3: "name",
@@ -512,7 +512,7 @@ func main() {
     fmt.Printf("Found %d users matching filters\n", len(users))
     
     // Example 2: Transaction with InTx
-    err = bunhelpers.InTx(ctx, db, func(ctx context.Context) error {
+    err = bunutils.InTx(ctx, db, func(ctx context.Context) error {
         user := &User{
             ID:     "123",
             Email:  "test@example.com",
@@ -528,11 +528,11 @@ func main() {
         log.Fatal(err)
     }
     
-    // Example 3: Using base bunhelpers.Where directly
-    baseWhere := &bunhelpers.Where{
+    // Example 3: Using base bunutils.Where directly
+    baseWhere := &bunutils.Where{
         IDs:   []string{"1", "2", "3"},
         Limit: ToPtr(10),
-        Order: bunhelpers.Order{1: "created_at"},
+        Order: bunutils.Order{1: "created_at"},
         SortBy:   1,
         SortDesc: true,
     }
@@ -604,6 +604,55 @@ func main() {
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+### Changeset Workflow
+
+This project uses a changeset-based workflow for versioning and releases, similar to [npm changesets](https://github.com/changesets/changesets).
+
+#### Adding a Changeset
+
+When you make changes that should be released, add a changeset:
+
+```bash
+just changeset
+```
+
+This will:
+1. Prompt you for the type of change (major/minor/patch)
+2. Ask for a description of your changes
+3. Create a changeset file in `.changeset/`
+
+Include this changeset file in your Pull Request.
+
+#### Changeset Types
+
+- **patch** - Bug fixes and minor changes (0.0.X)
+- **minor** - New features, backwards compatible (0.X.0)
+- **major** - Breaking changes (X.0.0)
+
+#### Checking Next Version
+
+To see what version will be released based on current changesets:
+
+```bash
+just version
+```
+
+#### Creating a Release
+
+When ready to release, run:
+
+```bash
+just release
+```
+
+This will:
+1. Calculate the next version based on changesets
+2. Update CHANGELOG.md with changes
+3. Remove processed changeset files
+4. Commit and push changes
+5. Create and push a version tag
+6. Trigger the GitHub Actions release workflow
 
 ## License
 

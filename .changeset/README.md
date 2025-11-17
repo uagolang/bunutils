@@ -28,4 +28,3 @@ The `bump` field can be:
 - `major` - Breaking changes (1.0.0 -> 2.0.0)
 - `minor` - New features (1.0.0 -> 1.1.0)
 - `patch` - Bug fixes (1.0.0 -> 1.0.1)
-

@@ -1,0 +1,41 @@
+name: Changeset Check
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Check for changeset
+        run: |
+          # Check if this PR has a changeset file
+          CHANGESET_COUNT=$(find .changeset -name "*.md" ! -name "README.md" | wc -l | tr -d ' ')
+          
+          if [ "$CHANGESET_COUNT" -eq 0 ]; then
+            echo "⚠️  No changeset found"
+            echo ""
+            echo "If your changes should be released, please add a changeset:"
+            echo "  make changeset"
+            echo ""
+            echo "If your changes don't need a release (docs, tests, chores), you can ignore this."
+            exit 0
+          else
+            echo "✅ Found $CHANGESET_COUNT changeset(s)"
+            echo ""
+            echo "Changeset files:"
+            for file in .changeset/*.md; do
+              if [[ "$file" == *"README.md" ]]; then
+                continue
+              fi
+              echo "  - $(basename $file)"
+            done
+          fi
+
+

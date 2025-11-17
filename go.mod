@@ -1,4 +1,4 @@
-module github.com/uagolang/bunhelpers
+module github.com/uagolang/bunutils
 
 go 1.25.2
 

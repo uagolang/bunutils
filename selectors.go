@@ -1,4 +1,4 @@
-package bunhelpers
+package bunutils
 
 import (
 	"fmt"

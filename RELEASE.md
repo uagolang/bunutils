@@ -104,11 +104,12 @@ When a version tag (e.g., `v0.3.0`) is pushed to the repository, the GitHub Acti
 
 1. Checks out the repository
 2. Sets up the Go environment
-3. Runs GoReleaser to:
+3. Extracts release notes from CHANGELOG.md for the specific version
+4. Runs GoReleaser to:
    - Build binaries (if applicable)
-   - Create a GitHub Release
+   - Create a GitHub Release with the extracted changelog
    - Attach release assets
-   - Publish release notes
+   - Publish release notes with your changeset descriptions
 
 **Workflow trigger:**
 ```yaml
@@ -116,6 +117,30 @@ on:
   push:
     tags:
       - 'v*.*.*'
+```
+
+**What appears in the GitHub Release:**
+- **Title**: The version tag (e.g., `v0.3.0`)
+- **Body**: All changeset descriptions from that release (extracted from CHANGELOG.md)
+- **Footer**: Link to full changelog and attribution
+
+**Example GitHub Release:**
+```
+## v0.3.0 - 2024-11-17
+
+- Renamed package from bunhelpers to bunutils
+- Added support for PostgreSQL JSONB array queries
+- Fixed transaction context handling in nested calls
+
+---
+
+**Full Changelog**: https://github.com/uagolang/bunutils/blob/main/CHANGELOG.md
+
+Released by GoReleaser.
+
+---
+
+UAGolang Community @uagolang
 ```
 
 ## Manual Release Steps

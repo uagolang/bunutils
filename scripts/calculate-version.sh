@@ -19,7 +19,7 @@ IFS='.' read -r major minor patch <<< "$version"
 changeset_count=$(find .changeset -name "*.md" ! -name "README.md" 2>/dev/null | wc -l | tr -d ' ')
 
 if [ "$changeset_count" -eq 0 ]; then
-  echo -e "${RED}No changesets found. Add a changeset first with: make changeset${NC}" >&2
+  echo -e "${RED}No changesets found. Add a changeset first with: just changeset${NC}" >&2
   exit 1
 fi
 

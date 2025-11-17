@@ -57,10 +57,30 @@ else
   rm CHANGELOG.md.tmp
 fi
 
+# Extract the latest version's changelog for GitHub release notes
+echo "Extracting release notes for $next_version..."
+awk "/## $next_version/,/## v[0-9]/" CHANGELOG.md | sed '/## v[0-9]/d' | sed '/^$/d' > .release-notes.md
+
+# If release notes file is empty or doesn't exist, create a basic one
+if [ ! -s .release-notes.md ]; then
+  echo "## $next_version - $(date +%Y-%m-%d)" > .release-notes.md
+  echo "" >> .release-notes.md
+  for changeset_file in .changeset/*.md; do
+    if [[ "$changeset_file" == *"README.md" ]]; then
+      continue
+    fi
+    description=$(sed -n '/^---$/,/^---$/!p' "$changeset_file" | sed '/^---$/d' | sed '/^$/d')
+    if [ -n "$description" ]; then
+      echo "- $description" >> .release-notes.md
+    fi
+  done
+fi
+
 # Remove processed changesets
 find .changeset -name "*.md" ! -name "README.md" -delete
 
 echo -e "${GREEN}✓ Updated CHANGELOG.md${NC}"
+echo -e "${GREEN}✓ Created release notes file${NC}"
 echo -e "${GREEN}✓ Removed changeset files${NC}"
 echo ""
 
@@ -73,8 +93,8 @@ echo -e "${GREEN}✓ Committed and pushed changes${NC}"
 echo ""
 
 # Create and push tag
-#git tag "$next_version"
-#git push origin "$next_version"
+git tag "$next_version"
+git push origin "$next_version"
 
 echo ""
 echo -e "${GREEN}✓ Release $next_version created successfully!${NC}"

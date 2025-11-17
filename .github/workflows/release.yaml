@@ -18,6 +18,22 @@ jobs:
         with:
           go-version: stable
       
+      - name: Extract release notes from CHANGELOG
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          echo "Extracting release notes for $VERSION"
+          
+          # Extract the section for this version from CHANGELOG.md
+          awk "/## $VERSION/,/## v[0-9]/" CHANGELOG.md | sed '/## v[0-9]/d' | sed '1d' > .release-notes.md
+          
+          # If extraction failed or file is empty, use a default message
+          if [ ! -s .release-notes.md ]; then
+            echo "See [CHANGELOG.md](https://github.com/uagolang/bunutils/blob/main/CHANGELOG.md) for details." > .release-notes.md
+          fi
+          
+          echo "Release notes content:"
+          cat .release-notes.md
+      
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:

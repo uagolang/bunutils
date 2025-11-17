@@ -89,14 +89,10 @@ This command will:
 3. Generate changelog entries from changeset descriptions
 4. Update `CHANGELOG.md` with the new version and changes
 5. Remove all processed changeset files
-6. Commit the changes with message `chore: release vX.Y.Z`
-7. Push the commit to the repository
-
-**Note:** The script currently has tag creation commented out. You can enable it by uncommenting these lines in `scripts/release.sh`:
-```bash
-git tag "$next_version"
-git push origin "$next_version"
-```
+6. **Update `.changeset/config.json` with the new version**
+7. Commit the changes with message `chore: release vX.Y.Z`
+8. Push the commit to the repository
+9. Create and push the version tag (which triggers the GitHub Actions release workflow)
 
 ### 5. GitHub Actions Release Workflow
 
@@ -171,6 +167,27 @@ If you need to create a release manually without using the scripts:
    ```
 
 4. **Wait for GitHub Actions** to complete the release process
+
+## Version Tracking
+
+The current version is tracked in `.changeset/config.json` under the `version` key. This file serves as the source of truth for the current release version.
+
+**How version tracking works:**
+1. The `just version` command reads from `.changeset/config.json` to determine the current version
+2. It calculates the next version based on changesets
+3. When `just release` is run, it updates the version in config.json
+4. The version is also tagged in git for GitHub releases
+
+**Example config.json:**
+```json
+{
+  "changelog": true,
+  "commit": false,
+  "access": "public",
+  "baseBranch": "main",
+  "version": "v1.0.1"
+}
+```
 
 ## Version Numbering
 

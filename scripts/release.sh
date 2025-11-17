@@ -84,6 +84,20 @@ echo -e "${GREEN}✓ Created release notes file${NC}"
 echo -e "${GREEN}✓ Removed changeset files${NC}"
 echo ""
 
+# Update version in config.json
+if [ -f .changeset/config.json ]; then
+  # Use jq if available, otherwise use sed
+  if command -v jq &> /dev/null; then
+    jq --arg version "$next_version" '.version = $version' .changeset/config.json > .changeset/config.json.tmp
+    mv .changeset/config.json.tmp .changeset/config.json
+  else
+    # Fallback to sed if jq is not available
+    sed -i.bak "s/\"version\": \".*\"/\"version\": \"$next_version\"/" .changeset/config.json
+    rm -f .changeset/config.json.bak
+  fi
+  echo -e "${GREEN}✓ Updated version in config.json${NC}"
+fi
+
 # Stage changes
 git add CHANGELOG.md .changeset/
 git commit -m "chore: release $next_version"

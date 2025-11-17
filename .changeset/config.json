@@ -2,5 +2,6 @@
   "changelog": true,
   "commit": false,
   "access": "public",
-  "baseBranch": "main"
+  "baseBranch": "main",
+  "version": "v1.0.1"
 }

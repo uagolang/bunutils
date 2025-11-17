@@ -8,8 +8,24 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Get the latest git tag
-latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+# Get the latest version from config.json or git tag
+if [ -f .changeset/config.json ]; then
+  # Try to get version from config.json first
+  if command -v jq &> /dev/null; then
+    latest_tag=$(jq -r '.version // "v0.0.0"' .changeset/config.json)
+  else
+    # Fallback to grep/sed if jq is not available
+    latest_tag=$(grep -o '"version": *"[^"]*"' .changeset/config.json | sed 's/"version": *"\([^"]*\)"/\1/')
+  fi
+  
+  # If config.json doesn't have a version, fall back to git tag
+  if [ -z "$latest_tag" ] || [ "$latest_tag" = "null" ]; then
+    latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+  fi
+else
+  # Fall back to git tag if config.json doesn't exist
+  latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+fi
 
 # Remove 'v' prefix and split version
 version=${latest_tag#v}

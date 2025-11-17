@@ -1,4 +1,9 @@
 
+## v1.0.2 - 2025-11-17
+
+- Try to use Github Releases
+
+
 ## v1.0.1 - 2025-11-17
 
 - Updated readme and added instructions to release new versions

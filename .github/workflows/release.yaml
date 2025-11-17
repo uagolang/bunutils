@@ -19,6 +19,7 @@ jobs:
           go-version: stable
       
       - name: Extract release notes from CHANGELOG
+        id: release_notes
         run: |
           VERSION=${GITHUB_REF#refs/tags/}
           echo "Extracting release notes for $VERSION"
@@ -33,12 +34,15 @@ jobs:
           
           echo "Release notes content:"
           cat .release-notes.md
+          
+          # Set output for use in next step
+          echo "notes_file=.release-notes.md" >> $GITHUB_OUTPUT
       
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
           version: latest
-          args: release --clean
+          args: release --clean --release-notes=${{ steps.release_notes.outputs.notes_file }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

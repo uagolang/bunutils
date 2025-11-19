@@ -23,6 +23,10 @@ This library works with all databases supported by Bun (PostgreSQL, MySQL, SQLit
 
 All other features (transactions, basic selectors, querier interface, error handling, etc.) are database-agnostic and work across all supported databases.
 
+## TODO
+
+- [ ] Check versions less then 1.25 (1.23+, 1.24+)
+
 ## Installation
 
 ```bash

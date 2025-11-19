@@ -1,4 +1,4 @@
-module github.com/uagolang/bunutils
+module github.com/nesymno/bunutils
 
 go 1.25.2
 

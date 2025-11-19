@@ -29,7 +29,7 @@ jobs:
           
           # If extraction failed or file is empty, use a default message
           if [ ! -s .release-notes.md ]; then
-            echo "See [CHANGELOG.md](https://github.com/uagolang/bunutils/blob/main/CHANGELOG.md) for details." > .release-notes.md
+            echo "See [CHANGELOG.md](https://github.com/nesymno/bunutils/blob/main/CHANGELOG.md) for details." > .release-notes.md
           fi
           
           echo "Release notes content:"

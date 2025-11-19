@@ -130,7 +130,7 @@ on:
 
 ---
 
-**Full Changelog**: https://github.com/uagolang/bunutils/blob/main/CHANGELOG.md
+**Full Changelog**: https://github.com/nesymno/bunutils/blob/main/CHANGELOG.md
 
 Released by GoReleaser.
 

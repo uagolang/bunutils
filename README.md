@@ -30,7 +30,7 @@ All other features (transactions, basic selectors, querier interface, error hand
 ## Installation
 
 ```bash
-go get github.com/uagolang/bunutils
+go get github.com/nesymno/bunutils
 ```
 
 ## Quick Start
@@ -42,7 +42,7 @@ import (
     "context"
     "database/sql"
     
-    "github.com/uagolang/bunutils"
+    "github.com/nesymno/bunutils"
     "github.com/uptrace/bun"
     "github.com/uptrace/bun/dialect/pgdialect"
     "github.com/uptrace/bun/driver/pgdriver"
@@ -373,7 +373,7 @@ import (
     "log"
     "time"
 
-    "github.com/uagolang/bunutils"
+    "github.com/nesymno/bunutils"
     "github.com/uptrace/bun"
     "github.com/uptrace/bun/dialect/pgdialect"
     "github.com/uptrace/bun/driver/pgdriver"

@@ -113,6 +113,6 @@ git push origin "$next_version"
 echo ""
 echo -e "${GREEN}✓ Release $next_version created successfully!${NC}"
 echo ""
-echo "Check GitHub Actions: https://github.com/uagolang/bunutils/actions"
+echo "Check GitHub Actions: https://github.com/nesymno/bunutils/actions"
 
 
